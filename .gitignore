@@ -1,0 +1,12 @@
+# Dependencies 
+node_modules/
+dist/
+coverage/
+
+.vscode/
+.DS_Store
+.env
+
+*.log
+*.tmp
+
