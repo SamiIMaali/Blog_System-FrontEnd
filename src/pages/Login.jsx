@@ -28,6 +28,10 @@ export default function Login() {
       // Store the authentication token
       localStorage.setItem('token', data.token);
 
+      // Store the authenticated user's information
+      if (data.user && data.user.id) {
+       localStorage.setItem('user', JSON.stringify(data.user));
+      }
       // Redirect to the home page
       navigate('/');
     } catch (err) {

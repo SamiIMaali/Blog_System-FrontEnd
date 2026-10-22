@@ -78,3 +78,56 @@ export const createPost = async (postData) => {
 
   return handleResponse(res);
 };
+
+// Get a single post by ID
+export const getPostById = async (id) => {
+  const res = await fetch(
+    buildApiUrl(`/posts/${encodeURIComponent(id)}`)
+  );
+
+  return handleResponse(res);
+};
+
+// Update an existing post
+export const updatePost = async (id, postData) => {
+  const token = localStorage.getItem('token');
+
+  if (!token) {
+    throw new Error('Please log in to update a post');
+  }
+
+  const res = await fetch(
+    buildApiUrl(`/posts/${encodeURIComponent(id)}`),
+    {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(postData),
+    }
+  );
+
+  return handleResponse(res);
+};
+
+// Delete an existing post
+export const deletePost = async (id) => {
+  const token = localStorage.getItem('token');
+
+  if (!token) {
+    throw new Error('Please log in to delete a post');
+  }
+
+  const res = await fetch(
+    buildApiUrl(`/posts/${encodeURIComponent(id)}`),
+    {
+      method: 'DELETE',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+
+  return handleResponse(res);
+};

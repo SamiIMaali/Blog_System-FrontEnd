@@ -27,6 +27,28 @@ export default function Home() {
     fetchPosts();
   }, []);
 
+  // Update a post in the current list without reloading the page.
+  const handlePostUpdated = (updatedPost) => {
+    setPosts((currentPosts) =>
+      currentPosts.map((post) =>
+        post._id === updatedPost._id
+          ? {
+              ...post,
+              ...updatedPost,
+              user: post.user,
+            }
+          : post
+      )
+    );
+  };
+
+  // Remove a deleted post from the current list.
+  const handlePostDeleted = (postId) => {
+    setPosts((currentPosts) =>
+      currentPosts.filter((post) => post._id !== postId)
+    );
+  };
+
   if (loading) {
     return <p>Loading posts...</p>;
   }
@@ -47,7 +69,12 @@ export default function Home() {
 
       <div className="flex flex-col gap-4">
         {posts.map((post) => (
-          <PostCard key={post._id} post={post} />
+          <PostCard
+            key={post._id}
+            post={post}
+            onPostUpdated={handlePostUpdated}
+            onPostDeleted={handlePostDeleted}
+          />
         ))}
       </div>
     </div>
