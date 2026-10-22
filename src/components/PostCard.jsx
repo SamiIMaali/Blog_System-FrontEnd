@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { updatePost, deletePost } from '../services/api';
+import './PostCard.css';
 
 export default function PostCard({
   post,
@@ -20,9 +21,7 @@ export default function PostCard({
     try {
       const storedUser = localStorage.getItem('user');
 
-      setCurrentUser(
-        storedUser ? JSON.parse(storedUser) : null
-      );
+      setCurrentUser(storedUser ? JSON.parse(storedUser) : null);
     } catch {
       setCurrentUser(null);
     }
@@ -34,17 +33,20 @@ export default function PostCard({
   }, [post.title, post.content]);
 
   const ownerId =
-    typeof post.user === 'object'
-      ? post.user?._id
-      : post.user;
+    typeof post.user === 'object' ? post.user?._id : post.user;
 
   const isOwner =
     Boolean(currentUser?.id) &&
     Boolean(ownerId) &&
     String(currentUser.id) === String(ownerId);
 
-  const handleUpdate = async (e) => {
-    e.preventDefault();
+  const authorName =
+    typeof post.user === 'object'
+      ? post.user?.username || 'Community member'
+      : 'Community member';
+
+  const handleUpdate = async (event) => {
+    event.preventDefault();
 
     setError('');
     setSuccess('');
@@ -66,7 +68,6 @@ export default function PostCard({
       });
 
       onPostUpdated(updatedPost);
-
       setIsEditing(false);
       setSuccess('Post updated successfully.');
     } catch (err) {
@@ -91,7 +92,6 @@ export default function PostCard({
 
     try {
       await deletePost(post._id);
-
       onPostDeleted(post._id);
     } catch (err) {
       setError(err.message || 'Failed to delete post.');
@@ -109,110 +109,61 @@ export default function PostCard({
   };
 
   return (
-    <article
-      style={{
-        background: '#fff',
-        padding: 16,
-        borderRadius: 10,
-        boxShadow: '0 1px 6px rgba(0,0,0,.06)',
-        border: '1px solid #e5e7eb',
-      }}
-    >
+    <article className="post-card">
+      <div className="post-card-topline">
+        <span className="post-category">
+          <span aria-hidden="true">✦</span>
+          COMMUNITY STORY
+        </span>
+
+        {isOwner && !isEditing && (
+          <span className="post-owner-badge">Your post</span>
+        )}
+      </div>
+
       {isEditing ? (
-        <form onSubmit={handleUpdate}>
-          <div style={{ marginBottom: 12 }}>
-            <label
-              htmlFor={`title-${post._id}`}
-              style={{
-                display: 'block',
-                marginBottom: 6,
-                fontWeight: 600,
-              }}
-            >
-              Title
-            </label>
+        <form className="post-edit-form" onSubmit={handleUpdate}>
+          <div className="post-form-field">
+            <label htmlFor={`title-${post._id}`}>Post title</label>
 
             <input
               id={`title-${post._id}`}
               type="text"
               value={title}
-              onChange={(e) => setTitle(e.target.value)}
+              onChange={(event) => setTitle(event.target.value)}
               required
               maxLength={200}
               disabled={loading}
-              style={{
-                width: '100%',
-                boxSizing: 'border-box',
-                padding: 10,
-                border: '1px solid #d1d5db',
-                borderRadius: 6,
-              }}
             />
           </div>
 
-          <div style={{ marginBottom: 12 }}>
-            <label
-              htmlFor={`content-${post._id}`}
-              style={{
-                display: 'block',
-                marginBottom: 6,
-                fontWeight: 600,
-              }}
-            >
-              Content
-            </label>
+          <div className="post-form-field">
+            <label htmlFor={`content-${post._id}`}>Post content</label>
 
             <textarea
               id={`content-${post._id}`}
               value={content}
-              onChange={(e) => setContent(e.target.value)}
+              onChange={(event) => setContent(event.target.value)}
               required
-              rows={5}
+              rows={6}
               disabled={loading}
-              style={{
-                width: '100%',
-                boxSizing: 'border-box',
-                padding: 10,
-                border: '1px solid #d1d5db',
-                borderRadius: 6,
-                resize: 'vertical',
-              }}
             />
           </div>
 
-          <div
-            style={{
-              display: 'flex',
-              gap: 8,
-              flexWrap: 'wrap',
-            }}
-          >
+          <div className="post-actions">
             <button
               type="submit"
+              className="post-button post-button-primary"
               disabled={loading}
-              style={{
-                background: '#2563eb',
-                color: '#fff',
-                padding: '8px 14px',
-                borderRadius: 6,
-                border: 'none',
-                cursor: loading ? 'not-allowed' : 'pointer',
-                opacity: loading ? 0.6 : 1,
-              }}
             >
-              {loading ? 'Saving...' : 'Save Changes'}
+              {loading ? 'Saving...' : 'Save changes'}
             </button>
 
             <button
               type="button"
+              className="post-button post-button-secondary"
               onClick={handleCancelEdit}
               disabled={loading}
-              style={{
-                padding: '8px 14px',
-                borderRadius: 6,
-                border: '1px solid #d1d5db',
-                cursor: loading ? 'not-allowed' : 'pointer',
-              }}
             >
               Cancel
             </button>
@@ -220,103 +171,61 @@ export default function PostCard({
         </form>
       ) : (
         <>
-          <h3
-            style={{
-              margin: '0 0 10px',
-              fontSize: 20,
-              fontWeight: 600,
-              overflowWrap: 'anywhere',
-            }}
-          >
-            {post.title}
-          </h3>
+          <h3 className="post-title">{post.title}</h3>
 
-          <p
-            style={{
-              margin: '0 0 14px',
-              lineHeight: 1.6,
-              whiteSpace: 'pre-wrap',
-              overflowWrap: 'anywhere',
-            }}
-          >
-            {post.content}
-          </p>
+          <p className="post-content">{post.content}</p>
 
-          <small style={{ color: '#6b7280' }}>
-            By: {post.user?.username || 'Unknown'}
-          </small>
+          <div className="post-card-divider" />
 
-          {isOwner && (
-            <div
-              style={{
-                display: 'flex',
-                gap: 8,
-                marginTop: 14,
-                flexWrap: 'wrap',
-              }}
-            >
-              <button
-                type="button"
-                onClick={() => {
-                  setError('');
-                  setSuccess('');
-                  setIsEditing(true);
-                }}
-                disabled={loading}
-                style={{
-                  background: '#2563eb',
-                  color: '#fff',
-                  padding: '8px 14px',
-                  border: 'none',
-                  borderRadius: 6,
-                  cursor: 'pointer',
-                }}
-              >
-                Edit
-              </button>
+          <div className="post-card-bottom">
+            <div className="post-author">
+              <span className="author-avatar" aria-hidden="true">
+                {authorName.charAt(0).toUpperCase()}
+              </span>
 
-              <button
-                type="button"
-                onClick={handleDelete}
-                disabled={loading}
-                style={{
-                  background: '#dc2626',
-                  color: '#fff',
-                  padding: '8px 14px',
-                  border: 'none',
-                  borderRadius: 6,
-                  cursor: loading ? 'not-allowed' : 'pointer',
-                  opacity: loading ? 0.6 : 1,
-                }}
-              >
-                {loading ? 'Please wait...' : 'Delete'}
-              </button>
+              <div className="author-details">
+                <span className="author-label">Written by</span>
+                <span className="author-name">{authorName}</span>
+              </div>
             </div>
-          )}
+
+            {isOwner && (
+              <div className="post-actions">
+                <button
+                  type="button"
+                  className="post-button post-button-edit"
+                  onClick={() => {
+                    setError('');
+                    setSuccess('');
+                    setIsEditing(true);
+                  }}
+                  disabled={loading}
+                >
+                  Edit
+                </button>
+
+                <button
+                  type="button"
+                  className="post-button post-button-delete"
+                  onClick={handleDelete}
+                  disabled={loading}
+                >
+                  {loading ? 'Please wait...' : 'Delete'}
+                </button>
+              </div>
+            )}
+          </div>
         </>
       )}
 
       {error && (
-        <p
-          role="alert"
-          style={{
-            color: '#dc2626',
-            marginTop: 12,
-            overflowWrap: 'anywhere',
-          }}
-        >
+        <p className="post-feedback post-feedback-error" role="alert">
           {error}
         </p>
       )}
 
       {success && (
-        <p
-          role="status"
-          style={{
-            color: '#15803d',
-            marginTop: 12,
-          }}
-        >
+        <p className="post-feedback post-feedback-success" role="status">
           {success}
         </p>
       )}

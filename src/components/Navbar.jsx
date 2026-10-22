@@ -1,55 +1,78 @@
-import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, NavLink, useNavigate } from 'react-router-dom';
+import './Navbar.css';
 
 export default function Navbar() {
   const navigate = useNavigate();
   const token = localStorage.getItem('token');
 
   const handleLogout = () => {
-    // Remove authentication token.
     localStorage.removeItem('token');
-
-    // Remove stored user information.
     localStorage.removeItem('user');
 
-    // Redirect to the login page.
-    navigate('/login');
+    navigate('/login', { replace: true });
   };
 
   return (
-    <nav
-      style={{
-        background: '#fff',
-        padding: 12,
-        boxShadow: '0 1px 4px rgba(0,0,0,.06)',
-      }}
-    >
-      <div
-        style={{
-          maxWidth: 900,
-          margin: '0 auto',
-          display: 'flex',
-          gap: 12,
-          alignItems: 'center',
-        }}
-      >
-        <Link to="/">Home</Link>
+    <header className="site-header">
+      <nav className="navbar" aria-label="Main navigation">
+        <Link to="/" className="navbar-brand" aria-label="Blog System home">
+          <span className="brand-icon" aria-hidden="true">
+            B
+          </span>
 
-        {token ? (
-          <>
-            <Link to="/create">New Post</Link>
+          <span className="brand-text">
+            Blog<span>System</span>
+          </span>
+        </Link>
 
-            <button type="button" onClick={handleLogout}>
-              Logout
-            </button>
-          </>
-        ) : (
-          <>
-            <Link to="/login">Login</Link>
-            <Link to="/register">Register</Link>
-          </>
-        )}
-      </div>
-    </nav>
+        <div className="navbar-links">
+          <NavLink
+            to="/"
+            end
+            className={({ isActive }) =>
+              `navbar-link${isActive ? ' active' : ''}`
+            }
+          >
+            Home
+          </NavLink>
+
+          {token ? (
+            <>
+              <NavLink
+                to="/create"
+                className={({ isActive }) =>
+                  `navbar-link${isActive ? ' active' : ''}`
+                }
+              >
+                New Post
+              </NavLink>
+
+              <button
+                type="button"
+                className="navbar-button navbar-button-outline"
+                onClick={handleLogout}
+              >
+                Logout
+              </button>
+            </>
+          ) : (
+            <>
+              <NavLink
+                to="/login"
+                className={({ isActive }) =>
+                  `navbar-link${isActive ? ' active' : ''}`
+                }
+              >
+                Login
+              </NavLink>
+
+              <Link to="/register" className="navbar-button navbar-button-primary">
+                Get Started
+              </Link>
+            </>
+          )}
+        </div>
+      </nav>
+    </header>
   );
 }

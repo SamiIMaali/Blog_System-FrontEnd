@@ -1,45 +1,17 @@
-body {
-  font-family: Arial, sans-serif;
-  background-color: #f4f4f9;
-  margin: 0;
-  padding: 0;
+.app {
+  min-height: 100vh;
 }
 
-nav {
-  background-color: #333;
-  color: white;
-  padding: 10px;
-  text-align: center;
+.app-main {
+  width: min(100% - 40px, 1100px);
+  margin: 0 auto;
+  padding: 36px 0 64px;
 }
 
-nav a {
-  color: white;
-  margin: 0 10px;
-  text-decoration: none;
-}
-
-form {
-  display: flex;
-  flex-direction: column;
-  width: 300px;
-  margin: 20px auto;
-  gap: 10px;
-}
-
-input, textarea {
-  padding: 8px;
-  font-size: 16px;
-}
-
-button {
-  padding: 10px;
-  font-size: 16px;
-  background-color: #333;
-  color: white;
-  border: none;
-  cursor: pointer;
-}
-
-button:disabled {
-  background-color: gray;
+@media (max-width: 600px) {
+  .app-main {
+    width: calc(100% - 28px);
+    padding-top: 24px;
+    padding-bottom: 40px;
+  }
 }

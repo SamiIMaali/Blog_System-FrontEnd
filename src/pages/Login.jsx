@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { loginUser } from '../services/api';
+import './Auth.css';
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -18,21 +19,18 @@ export default function Login() {
     try {
       const data = await loginUser({ email, password });
 
-      // Validate the authentication token
       if (typeof data?.token !== 'string' || !data.token.trim()) {
         throw new Error(
           'Login response does not contain a valid authentication token'
         );
       }
 
-      // Store the authentication token
       localStorage.setItem('token', data.token);
 
-      // Store the authenticated user's information
       if (data.user && data.user.id) {
-       localStorage.setItem('user', JSON.stringify(data.user));
+        localStorage.setItem('user', JSON.stringify(data.user));
       }
-      // Redirect to the home page
+
       navigate('/');
     } catch (err) {
       setError(err.message || 'Login failed');
@@ -42,49 +40,71 @@ export default function Login() {
   };
 
   return (
-    <form
-      onSubmit={handleLogin}
-      className="max-w-md mx-auto mt-10 p-6 bg-white shadow-md rounded-2xl flex flex-col gap-4"
-    >
-      <h2 className="text-2xl font-semibold text-center mb-2">
-        Login
-      </h2>
+    <section className="auth-page">
+      <div className="auth-card">
+        <header className="auth-header">
+          <div className="auth-icon" aria-hidden="true">
+            B
+          </div>
 
-      <input
-        type="email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        placeholder="Email"
-        autoComplete="email"
-        required
-        className="border p-2 rounded-md"
-      />
+          <h1>Welcome back</h1>
 
-      <input
-        type="password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-        placeholder="Password"
-        autoComplete="current-password"
-        required
-        className="border p-2 rounded-md"
-      />
+          <p>
+            Sign in to continue sharing your ideas with the community.
+          </p>
+        </header>
 
-      {error && (
-        <p className="text-red-500 text-sm" role="alert">
-          {error}
+        <form className="auth-form" onSubmit={handleLogin}>
+          <div className="auth-field">
+            <label htmlFor="login-email">Email address</label>
+
+            <input
+              id="login-email"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="you@example.com"
+              autoComplete="email"
+              required
+              disabled={loading}
+            />
+          </div>
+
+          <div className="auth-field">
+            <label htmlFor="login-password">Password</label>
+
+            <input
+              id="login-password"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Enter your password"
+              autoComplete="current-password"
+              required
+              disabled={loading}
+            />
+          </div>
+
+          {error && (
+            <p className="auth-error" role="alert">
+              {error}
+            </p>
+          )}
+
+          <button
+            type="submit"
+            className="auth-submit"
+            disabled={loading}
+          >
+            {loading ? 'Signing in...' : 'Sign in'}
+            {!loading && <span aria-hidden="true">→</span>}
+          </button>
+        </form>
+
+        <p className="auth-footer">
+          Don't have an account? <Link to="/register">Create one</Link>
         </p>
-      )}
-
-      <button
-        type="submit"
-        disabled={loading}
-        className={`bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition ${
-          loading ? 'opacity-50 cursor-not-allowed' : ''
-        }`}
-      >
-        {loading ? 'Logging in...' : 'Login'}
-      </button>
-    </form>
+      </div>
+    </section>
   );
 }
